@@ -110,7 +110,7 @@ function AdminUsers({ user, onLogout }) {
             {['', 'student', 'teacher', 'admin'].map(role => (
               <button key={role} className={`filter-tab ${filterRole === role ? 'active' : ''}`}
                 onClick={() => setFilterRole(role)}>
-                {role || 'All'}
+                {role ? role.charAt(0).toUpperCase() + role.slice(1) : 'All'}
               </button>
             ))}
           </div>
@@ -128,7 +128,9 @@ function AdminUsers({ user, onLogout }) {
               <div className="tc-student-info">
                 <p className="tc-student-name">{u.username}</p>
                 <p className="tc-student-stats">
-                  {u.role} · {u.points} pts · {u.discoveries} discoveries · {u.badges} badges
+                  {u.role === 'student' && <>Student · {u.points} pts · {u.discoveries} discoveries · {u.badges} badges</>}
+                  {u.role === 'teacher' && <>Teacher · {u.classes || 0} class{u.classes === 1 ? '' : 'es'}</>}
+                  {u.role === 'admin' && <>Administrator</>}
                 </p>
               </div>
               {confirmDelete === u.username ? (

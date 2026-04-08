@@ -1475,16 +1475,19 @@ def admin_get_users(admin_username: str, role: str = "", db: Session = Depends(g
     if role:
         query = query.filter(UserModel.role == role.lower())
     users = query.all()
-    return [
-        {
+    result = []
+    for u in users:
+        entry = {
             "username": u.username,
             "role": u.role,
             "points": u.points or 0,
             "discoveries": len(u.discovered or []),
             "badges": len(u.badges or []),
         }
-        for u in users
-    ]
+        if u.role == "teacher":
+            entry["classes"] = db.query(ClassModel).filter(ClassModel.teacher_username == u.username).count()
+        result.append(entry)
+    return result
 
 
 @app.post("/api/admin/create-account")
