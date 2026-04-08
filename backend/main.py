@@ -286,7 +286,7 @@ def seed_from_json():
                 discovered=[],
                 badges=[],
                 quiz_scores={},
-                must_reset_password=0,
+                must_reset_password=1,
             )
             db.add(admin)
             db.commit()
@@ -1485,7 +1485,13 @@ def admin_get_users(admin_username: str, role: str = "", db: Session = Depends(g
             "badges": len(u.badges or []),
         }
         if u.role == "teacher":
-            entry["classes"] = db.query(ClassModel).filter(ClassModel.teacher_username == u.username).count()
+            teacher_classes = db.query(ClassModel).filter(ClassModel.teacher_username == u.username).all()
+            entry["classes"] = len(teacher_classes)
+            entry["custom_quizzes"] = db.query(CustomQuizModel).filter(CustomQuizModel.teacher_username == u.username).count()
+            total_students = 0
+            for tc in teacher_classes:
+                total_students += db.query(ClassMemberModel).filter(ClassMemberModel.class_id == tc.id).count()
+            entry["total_students"] = total_students
         result.append(entry)
     return result
 
@@ -1630,11 +1636,16 @@ def admin_get_feedback(admin_username: str, db: Session = Depends(get_db)):
     all_fb = db.query(FeedbackModel).all()
 
     # Aggregate by role
-    summary = {"student": {}, "teacher": {}, "student_count": 0, "teacher_count": 0}
+    summary = {"student": {}, "teacher": {}, "student_count": 0, "teacher_count": 0,
+               "student_comments": [], "teacher_comments": []}
     for fb in all_fb:
         role = fb.role
         summary[f"{role}_count"] = summary.get(f"{role}_count", 0) + 1
         for key, val in (fb.responses or {}).items():
+            if key == "free_response":
+                if val and str(val).strip():
+                    summary[f"{role}_comments"].append(str(val).strip())
+                continue
             if key not in summary[role]:
                 summary[role][key] = {"total": 0, "count": 0}
             try:

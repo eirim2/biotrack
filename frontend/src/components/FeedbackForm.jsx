@@ -31,8 +31,9 @@ function FeedbackForm({ user, onLogout }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (Object.keys(responses).length < questions.length) {
-      setError('Please answer all questions before submitting.');
+    const ratingKeys = Object.keys(responses).filter(k => k !== 'free_response');
+    if (ratingKeys.length < questions.length) {
+      setError('Please answer all rating questions before submitting.');
       return;
     }
     setLoading(true);
@@ -73,6 +74,9 @@ function FeedbackForm({ user, onLogout }) {
         <div className="profile-section">
           <h2>{isTeacher ? '🏫' : '🎒'} {isTeacher ? 'Teacher' : 'Student'} Feedback</h2>
           <form onSubmit={handleSubmit}>
+            <p style={{ fontSize: 13, color: '#999', marginBottom: 20, fontStyle: 'italic' }}>
+              Rate each question from 1 (Poor) to 5 (Excellent)
+            </p>
             {questions.map(q => (
               <div key={q.key} style={{ marginBottom: 24 }}>
                 <p style={{ fontWeight: 600, marginBottom: 10, color: 'var(--top-gradient)' }}>{q.label}</p>
@@ -86,9 +90,17 @@ function FeedbackForm({ user, onLogout }) {
                     </button>
                   ))}
                 </div>
-                <p style={{ fontSize: 12, color: '#999', marginTop: 4 }}>1 = Poor, 5 = Excellent</p>
               </div>
             ))}
+
+            <div style={{ marginBottom: 24 }}>
+              <p style={{ fontWeight: 600, marginBottom: 10, color: 'var(--top-gradient)' }}>Additional comments or suggestions (optional)</p>
+              <textarea className="form-textarea" rows={4}
+                value={responses.free_response || ''}
+                onChange={e => setResponses(p => ({ ...p, free_response: e.target.value }))}
+                placeholder="Share any other thoughts about BioTrack..." />
+            </div>
+
             <button type="submit" className="btn-primary" style={{ maxWidth: 280 }} disabled={loading}>
               {loading ? 'Submitting...' : 'Submit Anonymous Feedback'}
             </button>

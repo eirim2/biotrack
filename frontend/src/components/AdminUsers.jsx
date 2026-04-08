@@ -129,7 +129,7 @@ function AdminUsers({ user, onLogout }) {
                 <p className="tc-student-name">{u.username}</p>
                 <p className="tc-student-stats">
                   {u.role === 'student' && <>Student · {u.points} pts · {u.discoveries} discoveries · {u.badges} badges</>}
-                  {u.role === 'teacher' && <>Teacher · {u.classes || 0} class{u.classes === 1 ? '' : 'es'}</>}
+                  {u.role === 'teacher' && <>Teacher · {u.classes || 0} class{u.classes === 1 ? '' : 'es'} · {u.custom_quizzes || 0} quiz{u.custom_quizzes === 1 ? '' : 'zes'} · {u.total_students || 0} student{u.total_students === 1 ? '' : 's'}</>}
                   {u.role === 'admin' && <>Administrator</>}
                 </p>
               </div>

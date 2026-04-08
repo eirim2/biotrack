@@ -96,12 +96,10 @@ function Navigation({ user, onLogout }) {
           </>
         )}
 
-        {/* Settings — icon only for student/teacher */}
-        {!isAdmin && (
-          <Link to="/settings" className={`nav-link nav-icon-link ${isActive('/settings')}`} title="Settings">
+        {/* Settings — icon only */}
+        <Link to="/settings" className={`nav-link nav-icon-link ${isActive('/settings')}`} title="Settings">
             ⚙️
           </Link>
-        )}
 
         <button onClick={onLogout} className="btn-logout">
           Logout
