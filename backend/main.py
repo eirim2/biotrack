@@ -567,6 +567,23 @@ def reset_password(payload: PasswordResetRequest, db: Session = Depends(get_db))
     db.commit()
     return {"message": "Password reset successfully", "user": user_to_dict(user)}
 
+class ForceResetRequest(BaseModel):
+    username: str
+    new_password: str
+
+@app.post("/api/password/force-reset")
+def force_reset_password(payload: ForceResetRequest, db: Session = Depends(get_db)):
+    user = db.query(UserModel).filter(UserModel.username == payload.username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not user.must_reset_password:
+        raise HTTPException(status_code=403, detail="Force reset not allowed")
+    if len(payload.new_password) < 4:
+        raise HTTPException(status_code=400, detail="New password must be at least 4 characters")
+    user.password = hash_password(payload.new_password)
+    user.must_reset_password = 0
+    db.commit()
+    return {"message": "Password reset successfully", "user": user_to_dict(user)}
 
 # ──────────────────────────────────────────────
 # Animals
@@ -1602,6 +1619,12 @@ def admin_create_animal(payload: AdminCreateAnimalRequest, admin_username: str, 
     existing = db.query(AnimalModel).filter(AnimalModel.id == payload.id).first()
     if existing:
         raise HTTPException(status_code=400, detail="Animal ID already exists")
+    image_name = payload.data.get("imageKey", "")
+    if image_name:
+        valid_ext = ('.jpg', '.jpeg', '.png', '.gif', '.webp')
+        img_path = STATIC_DIR / image_name
+        if not img_path.exists() or not image_name.lower().endswith(valid_ext):
+            raise HTTPException(status_code=400, detail=f"Image '{image_name}' not found in backend/static or is not a valid image file")
     db.add(AnimalModel(id=payload.id, data=payload.data))
     db.commit()
     return {"message": "Animal created successfully", "id": payload.id}
@@ -1664,22 +1687,12 @@ def admin_get_feedback(admin_username: str, db: Session = Depends(get_db)):
 
 
 # ── Chatbot Q&A ──────────────────────────────────────────────────────────────
-CHATBOT_QA = [
-    {"question": "What does conservation status mean?", "answer": "Conservation status indicates how at-risk a species is of extinction. Categories range from 'Least Concern' (not threatened) to 'Critically Endangered' (facing an extremely high risk of extinction in the wild). BioTrack uses the IUCN Red List categories."},
-    {"question": "How do I earn badges?", "answer": "You earn badges by completing activities! Take your first quiz to earn 'First Quiz,' get a perfect score for 'Perfect Score,' discover all animals for 'Full Explorer,' complete flashcard sets, win match games, participate in BioQuiz, and reach point milestones. Check your profile to see all earned badges."},
-    {"question": "How do I earn points?", "answer": "Points are earned through quizzes (100 pts per correct answer), flashcard sets (50 pts per card studied), match games (200 pts per completion), BioQuiz games (points based on speed and accuracy), and completing class assignments."},
-    {"question": "How do I join a class?", "answer": "Go to 'Classes' from the navigation bar, then enter the 6-character code your teacher gave you. Once you join, you'll see assignments, the class leaderboard, and any active BioQuiz games."},
-    {"question": "What is BioQuiz?", "answer": "BioQuiz is a live competitive quiz game that your teacher launches from the class page. When a game is active, you'll see a 'Join BioQuiz' button on your class page. Answer questions quickly and correctly to earn points and compete with classmates!"},
-    {"question": "How do flashcards work?", "answer": "Go to 'Study' in the navigation bar to browse flashcard sets organized by animal category. You can flip through cards, mark them as mastered/learning/struggling, star important ones, and play a timed matching game to test your recall."},
-    {"question": "How do I take a quiz?", "answer": "Navigate to any animal's detail page and click 'Take Quiz.' You can also take quizzes assigned by your teacher from your Inbox or class page. Each quiz tests your knowledge about that animal."},
-    {"question": "What is the leaderboard?", "answer": "Each class has its own leaderboard that ranks students by total points earned. Points come from quizzes, flashcards, match games, BioQuiz, and assignments. Check your class page to see where you stand!"},
-    {"question": "How do I change my profile banner?", "answer": "Go to Settings and scroll to the Banner section. Choose from the available preset banners to personalize your profile page."},
-    {"question": "I forgot my password. What do I do?", "answer": "Please ask your teacher or school administrator for help. If your account was created by an admin, they can reset your credentials."},
-]
-
 @app.get("/api/chatbot/questions")
 def get_chatbot_questions():
-    return CHATBOT_QA
+    qa_path = DATA_DIR / "chatbot_qa.json"
+    if qa_path.exists():
+        return json.loads(qa_path.read_text(encoding="utf-8"))
+    return []
 
 
 # ──────────────────────────────────────────────

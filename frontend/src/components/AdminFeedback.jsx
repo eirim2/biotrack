@@ -56,7 +56,6 @@ function AdminFeedback({ user, onLogout }) {
                         </span>
                       </div>
                     </div>
-                    <span style={{ fontSize: 12, color: '#888' }}>{entry.count} responses</span>
                   </div>
                 );
               })}
@@ -66,7 +65,7 @@ function AdminFeedback({ user, onLogout }) {
                 <h3 style={{ fontSize: 15, marginBottom: 10, color: 'var(--top-gradient)' }}>💬 Comments ({comments.length})</h3>
                 {comments.map((c, i) => (
                   <div key={i} style={{ background: '#f5f5f5', borderRadius: 8, padding: '10px 14px', marginBottom: 8, fontSize: 14, color: '#444' }}>
-                    "{c}"
+                    {c}
                   </div>
                 ))}
               </div>

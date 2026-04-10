@@ -13,19 +13,21 @@ const THEME_COLORS = {
 };
 
 const BANNERS = [
-  { id: "forest", label: "Forest", gradient: "linear-gradient(135deg, #2e7d32, #81c784)" },
-  { id: "safari", label: "Safari", gradient: "linear-gradient(135deg, #6d4c41, #f57c00)" },
-  { id: "ocean", label: "Ocean", gradient: "linear-gradient(135deg, #0d47a1, #0288d1)" },
-  { id: "desert", label: "Desert", gradient: "linear-gradient(135deg, #9b7b36, #fab54d)" },
-  { id: "mesa", label: "Mesa", gradient: "linear-gradient(135deg, #D3503D, #E8872D)" },
-  { id: "arctic", label: "Arctic", gradient: "linear-gradient(135deg, #3949AB, #7986CB)" },
-  { id: "sunset", label: "Sunset", gradient: "linear-gradient(135deg, #ff6b35, #f7c59f)" },
-  { id: "jungle", label: "Jungle", gradient: "linear-gradient(135deg, #1b5e20, #4caf50)" },
+  { id: "forest", label: "Forest", gradient: "linear-gradient(135deg, #2e7d32, #81c784)", placeholder: "🌲🌳🌿" },
+  { id: "safari", label: "Safari", gradient: "linear-gradient(135deg, #6d4c41, #f57c00)", placeholder: "🦁🌅🐘" },
+  { id: "ocean", label: "Ocean", gradient: "linear-gradient(135deg, #0d47a1, #0288d1)", placeholder: "🌊🐠🐋" },
+  { id: "desert", label: "Desert", gradient: "linear-gradient(135deg, #9b7b36, #fab54d)", placeholder: "🏜️🌵☀️" },
+  { id: "mesa", label: "Mesa", gradient: "linear-gradient(135deg, #D3503D, #E8872D)", placeholder: "🏔️🌄🦅" },
+  { id: "arctic", label: "Arctic", gradient: "linear-gradient(135deg, #3949AB, #7986CB)", placeholder: "❄️🐧🏔️" },
+  { id: "sunset", label: "Sunset", gradient: "linear-gradient(135deg, #ff6b35, #f7c59f)", placeholder: "🌇🌆✨" },
+  { id: "jungle", label: "Jungle", gradient: "linear-gradient(135deg, #1b5e20, #4caf50)", placeholder: "🌴🦜🐒" },
 ];
 
 function Settings({ user, onLogout, updateUser }) {
   const [themeName, setThemeName] = useState(loadThemeName());
   const [banner, setBanner] = useState(user?.banner || null);
+  const isAdmin = user?.role === 'admin';
+  const isStudent = user?.role === 'student';
 
   const handleThemeChange = (name) => {
     setThemeName(name);
@@ -71,23 +73,27 @@ function Settings({ user, onLogout, updateUser }) {
             <p className="settings-note">Theme is saved on this device.</p>
           </div>
 
-          {/* Banner */}
-          <div className="profile-section">
-            <h2>🖼️ Profile Banner</h2>
-            <p style={{ color: '#666', marginBottom: 16 }}>
-              Choose a banner for your profile page. {banner ? 'Click the active banner to remove it.' : 'Select one below.'}
-            </p>
-            <div className="banner-grid">
-              {BANNERS.map(b => (
-                <button key={b.id} className={`banner-option${banner === b.id ? ' active' : ''}`}
-                  onClick={() => handleBannerChange(b.id)}>
-                  <div className="banner-preview" style={{ background: b.gradient }} />
-                  <span className="banner-label">{b.label}</span>
-                  {banner === b.id && <span className="banner-check">✓</span>}
-                </button>
-              ))}
+          {/* Banner — only for students */}
+          {isStudent && (
+            <div className="profile-section">
+              <h2>🖼️ Profile Banner</h2>
+              <p style={{ color: '#666', marginBottom: 16 }}>
+                Choose a banner for your profile page. {banner ? 'Click the active banner to remove it.' : 'Select one below.'}
+              </p>
+              <div className="banner-grid">
+                {BANNERS.map(b => (
+                  <button key={b.id} className={`banner-option${banner === b.id ? ' active' : ''}`}
+                    onClick={() => handleBannerChange(b.id)}>
+                    <div className="banner-preview banner-preview-wide" style={{ background: b.gradient }}>
+                      <span style={{ fontSize: 20 }}>{b.placeholder}</span>
+                    </div>
+                    <span className="banner-label">{b.label}</span>
+                    {banner === b.id && <span className="banner-check">✓</span>}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

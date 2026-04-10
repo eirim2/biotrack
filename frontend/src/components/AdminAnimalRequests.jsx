@@ -6,6 +6,8 @@ import axios from 'axios';
 function AdminAnimalRequests({ user, onLogout }) {
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState('');
+  const [confirmApprove, setConfirmApprove] = useState(null);
+  const [confirmDeny, setConfirmDeny] = useState(null);
   const navigate = useNavigate();
 
   const fetchRequests = async () => {
@@ -20,6 +22,7 @@ function AdminAnimalRequests({ user, onLogout }) {
   const handleApprove = async (id) => {
     try {
       await axios.post(`/api/admin/animal-requests/${id}/approve?admin_username=${user.username}`);
+      setConfirmApprove(null);
       fetchRequests();
       navigate(`/admin/create-animal?request_id=${id}`);
     } catch (err) { setError(err.response?.data?.detail || 'Failed to approve'); }
@@ -28,6 +31,7 @@ function AdminAnimalRequests({ user, onLogout }) {
   const handleDeny = async (id) => {
     try {
       await axios.post(`/api/admin/animal-requests/${id}/deny?admin_username=${user.username}`);
+      setConfirmDeny(null);
       fetchRequests();
     } catch (err) { setError(err.response?.data?.detail || 'Failed to deny'); }
   };
@@ -63,14 +67,28 @@ function AdminAnimalRequests({ user, onLogout }) {
                     <p className="tc-student-name">{r.common_name} ({r.scientific_name})</p>
                     <p className="tc-student-stats">
                       {r.category} · Requested by {r.teacher_username}
-                      {r.reason && <> · "{r.reason}"</>}
+                      {r.reason && <> · {r.reason}</>}
                     </p>
                   </div>
-                  <div className="tc-confirm-btns">
-                    <button className="btn-action" style={{ padding: '6px 16px', fontSize: 13 }}
-                      onClick={() => handleApprove(r.id)}>✓ Approve</button>
-                    <button className="tc-remove-confirm-btn" onClick={() => handleDeny(r.id)}>✕ Deny</button>
-                  </div>
+                  {confirmApprove === r.id ? (
+                    <div className="tc-confirm-btns">
+                      <button className="btn-action" style={{ padding: '6px 16px', fontSize: 13 }}
+                        onClick={() => handleApprove(r.id)}>Confirm Approve</button>
+                      <button className="tc-cancel-btn" onClick={() => setConfirmApprove(null)}>Cancel</button>
+                    </div>
+                  ) : confirmDeny === r.id ? (
+                    <div className="tc-confirm-btns">
+                      <button className="tc-remove-confirm-btn" onClick={() => handleDeny(r.id)}>Confirm Deny</button>
+                      <button className="tc-cancel-btn" onClick={() => setConfirmDeny(null)}>Cancel</button>
+                    </div>
+                  ) : (
+                    <div className="tc-confirm-btns">
+                      <button className="btn-action" style={{ padding: '6px 16px', fontSize: 13 }}
+                        onClick={() => { setConfirmApprove(r.id); setConfirmDeny(null); }}>✓ Approve</button>
+                      <button className="tc-remove-confirm-btn"
+                        onClick={() => { setConfirmDeny(r.id); setConfirmApprove(null); }}>✕ Deny</button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

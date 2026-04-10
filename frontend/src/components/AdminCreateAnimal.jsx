@@ -15,7 +15,7 @@ function AdminCreateAnimal({ user, onLogout }) {
     commonName: '', scientificName: '', category: 'Mammal',
     conservationStatus: 'Least Concern', habitat: '', region: '',
     diet: '', lifespan: '', weight: '', height: '', population: '',
-    description: '', funFacts: ['', '', '', ''],
+    description: '', funFacts: ['', '', '', ''], imageName: '',
   });
 
   useEffect(() => {
@@ -38,20 +38,21 @@ function AdminCreateAnimal({ user, onLogout }) {
     e.preventDefault();
     setError(''); setSuccess(''); setLoading(true);
     const id = nextId();
+    const imageName = form.imageName.trim();
     const data = {
       id, commonName: form.commonName.trim(), scientificName: form.scientificName.trim(),
       category: form.category, conservationStatus: form.conservationStatus,
       habitat: form.habitat.trim(), region: form.region.trim(), diet: form.diet.trim(),
       lifespan: form.lifespan.trim(), weight: form.weight.trim(), height: form.height.trim(),
       population: form.population.trim(), description: form.description.trim(),
-      funFacts: form.funFacts.filter(f => f.trim()), imageKey: '',
+      funFacts: form.funFacts.filter(f => f.trim()), imageKey: imageName,
     };
     try {
-      await axios.post(`/api/admin/animals?admin_username=${user.username}`, { id, data });
+      await axios.post(`/api/admin/animals?admin_username=${user.username}`, { id, data, image_name: imageName });
       setSuccess(`Animal "${data.commonName}" created with ID ${id}`);
       setForm({ commonName: '', scientificName: '', category: 'Mammal', conservationStatus: 'Least Concern',
         habitat: '', region: '', diet: '', lifespan: '', weight: '', height: '', population: '',
-        description: '', funFacts: ['', '', '', ''] });
+        description: '', funFacts: ['', '', '', ''], imageName: '' });
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to create animal');
     } finally { setLoading(false); }
@@ -102,6 +103,12 @@ function AdminCreateAnimal({ user, onLogout }) {
               <div className="form-group"><label>Weight</label><input type="text" value={form.weight} onChange={e => updateField('weight', e.target.value)} /></div>
               <div className="form-group"><label>Height/Size</label><input type="text" value={form.height} onChange={e => updateField('height', e.target.value)} /></div>
               <div className="form-group"><label>Population</label><input type="text" value={form.population} onChange={e => updateField('population', e.target.value)} /></div>
+              <div className="form-group">
+                <label>Image Filename</label>
+                <input type="text" value={form.imageName} onChange={e => updateField('imageName', e.target.value)}
+                  placeholder="e.g. lion.jpg (must be in backend/static)" />
+                <p style={{ fontSize: 11, color: '#999', marginTop: 4 }}>File must exist in backend/static/ and be a valid image (.jpg, .jpeg, .png, .gif, .webp)</p>
+              </div>
             </div>
             <div className="form-group">
               <label>Description *</label>

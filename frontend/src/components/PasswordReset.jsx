@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function PasswordReset({ user, onPasswordReset }) {
-  const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,9 +15,8 @@ function PasswordReset({ user, onPasswordReset }) {
 
     setLoading(true);
     try {
-      const res = await axios.post('/api/password/reset', {
+      const res = await axios.post('/api/password/force-reset', {
         username: user.username,
-        old_password: oldPassword,
         new_password: newPassword,
       });
       onPasswordReset(res.data.user);
@@ -41,11 +39,6 @@ function PasswordReset({ user, onPasswordReset }) {
         </p>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Temporary Password</label>
-            <input type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)}
-              required placeholder="Enter temporary password" />
-          </div>
           <div className="form-group">
             <label>New Password</label>
             <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)}

@@ -13,6 +13,7 @@ function AdminUsers({ user, onLogout }) {
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -25,7 +26,7 @@ function AdminUsers({ user, onLogout }) {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    setError(''); setCreateResult(null); setLoading(true);
+    setError(''); setCreateResult(null); setLoading(true); setCopied(false);
     try {
       const res = await axios.post(`/api/admin/create-account?admin_username=${user.username}`, {
         username: newUsername.trim(), role: newRole,
@@ -36,6 +37,15 @@ function AdminUsers({ user, onLogout }) {
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to create account');
     } finally { setLoading(false); }
+  };
+
+  const handleCopyCredentials = () => {
+    if (!createResult) return;
+    const text = `Username: ${createResult.username}\nTemporary password: ${createResult.temp_password}`;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   const handleDelete = async (username) => {
@@ -88,7 +98,7 @@ function AdminUsers({ user, onLogout }) {
                 <button type="submit" className="btn-primary" style={{ maxWidth: 200 }} disabled={loading}>
                   {loading ? 'Creating...' : 'Create Account'}
                 </button>
-                <button type="button" className="btn-back" onClick={() => { setShowCreate(false); setCreateResult(null); setError(''); }}>
+                <button type="button" className="btn-back" onClick={() => { setShowCreate(false); setCreateResult(null); setError(''); setCopied(false); }}>
                   Cancel
                 </button>
               </div>
@@ -98,8 +108,16 @@ function AdminUsers({ user, onLogout }) {
             <div className="created-code-box" style={{ marginTop: 16 }}>
               <p className="created-code-label">Account Created</p>
               <p><strong>Username:</strong> {createResult.username}</p>
-              <p><strong>Temporary Password:</strong> <code style={{ fontSize: '1.2rem', letterSpacing: 2 }}>{createResult.temp_password}</code></p>
-              <p style={{ fontSize: '0.85rem', color: '#888', marginTop: 8 }}>Share this password with the user. They will be prompted to reset it on first login.</p>
+              <p>
+                <strong>Temporary Password:</strong>{' '}
+                <code style={{ fontSize: '1.2rem', letterSpacing: 2 }}>{createResult.temp_password}</code>
+                <button onClick={handleCopyCredentials}
+                  style={{ marginLeft: 10, background: 'none', border: '1px solid #ccc', borderRadius: 4, padding: '4px 10px', cursor: 'pointer', fontSize: 13 }}
+                  title="Copy credentials to clipboard">
+                  {copied ? '✓ Copied' : '📋 Copy'}
+                </button>
+              </p>
+              <p style={{ fontSize: '0.85rem', color: '#888', marginTop: 8 }}>Share these credentials with the user. They will be prompted to set a new password on first login.</p>
             </div>
           )}
         </div>
@@ -126,7 +144,9 @@ function AdminUsers({ user, onLogout }) {
                 {u.role === 'admin' ? '🛡️' : u.role === 'teacher' ? '🏫' : '🎒'}
               </div>
               <div className="tc-student-info">
-                <p className="tc-student-name">{u.username}</p>
+                <p className="tc-student-name">
+                  {u.username}{u.username === user.username && <span style={{ color: '#888', fontWeight: 400 }}> (you)</span>}
+                </p>
                 <p className="tc-student-stats">
                   {u.role === 'student' && <>Student · {u.points} pts · {u.discoveries} discoveries · {u.badges} badges</>}
                   {u.role === 'teacher' && <>Teacher · {u.classes || 0} class{u.classes === 1 ? '' : 'es'} · {u.custom_quizzes || 0} quiz{u.custom_quizzes === 1 ? '' : 'zes'} · {u.total_students || 0} student{u.total_students === 1 ? '' : 's'}</>}

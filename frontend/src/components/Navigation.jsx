@@ -61,10 +61,13 @@ function Navigation({ user, onLogout }) {
               🏫 Classes
             </Link>
             <Link to="/teacher/custom-quizzes" className={`nav-link ${isActive('/teacher/custom-quizzes')}`}>
-              🧩 Custom Quizzes
+              🧩 Quizzes
             </Link>
-            <Link to="/feedback" className={`nav-link ${isActive('/feedback')}`}>
-              📝 Feedback
+            <Link to="/teacher/animal-request" className={`nav-link ${isActive('/teacher/animal-request')}`}>
+              🐾 Request Animal
+            </Link>
+            <Link to="/feedback" className={`nav-link nav-icon-link ${isActive('/feedback')}`} title="Feedback">
+              📝
             </Link>
           </>
         )}
@@ -98,8 +101,8 @@ function Navigation({ user, onLogout }) {
 
         {/* Settings — icon only */}
         <Link to="/settings" className={`nav-link nav-icon-link ${isActive('/settings')}`} title="Settings">
-            ⚙️
-          </Link>
+          ⚙️
+        </Link>
 
         <button onClick={onLogout} className="btn-logout">
           Logout
