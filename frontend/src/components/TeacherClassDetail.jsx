@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navigation from './Navigation';
+import BannerDisplay from './BannerDisplay';
+import { BANNERS } from './Settings';
 import axios from 'axios';
 
 function fuzzyMatch(target, query) {
@@ -128,6 +130,16 @@ function TeacherClassDetail({ user, onLogout }) {
     }
   };
 
+  const handleClassBanner = async (bannerId) => {
+    const newBanner = classroom.banner === bannerId ? null : bannerId;
+    try {
+      await axios.post(`/api/classes/${classId}/banner`, { banner: newBanner });
+      setClassroom(prev => ({ ...prev, banner: newBanner }));
+    } catch (err) {
+      console.error('Failed to set class banner', err);
+    }
+  };
+
   if (loading) {
     return (
       <div>
@@ -164,6 +176,7 @@ function TeacherClassDetail({ user, onLogout }) {
         </div>
 
         <div className="welcome-section">
+          <BannerDisplay bannerId={classroom?.banner} />
           <h1>🏫 {classroom.name}</h1>
           <p>Taught by {classroom.teacher_username} · {students.length} student{students.length !== 1 ? 's' : ''}</p>
         </div>
@@ -365,6 +378,30 @@ function TeacherClassDetail({ user, onLogout }) {
               </button>
             </div>
           )}
+        </div>
+
+        {/* Class Banner Picker */}
+        <div className="tc-panel" style={{ marginTop: 24 }}>
+          <h3 className="tc-panel-h3">🎨 Class Banner</h3>
+          <p style={{ color: '#666', marginBottom: 16, fontSize: '0.9rem' }}>Choose a banner that will display at the top of this class page for you and your students.</p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {BANNERS.map(b => (
+              <div
+                key={b.id}
+                onClick={() => handleClassBanner(b.id)}
+                style={{
+                  cursor: 'pointer',
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  border: classroom?.banner === b.id ? '3px solid var(--select-color)' : '3px solid transparent',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ width: 120, height: 40, background: b.gradient }} />
+                <p style={{ fontSize: '0.75rem', margin: '4px 0', fontWeight: classroom?.banner === b.id ? 700 : 400 }}>{b.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Class Leaderboard */}

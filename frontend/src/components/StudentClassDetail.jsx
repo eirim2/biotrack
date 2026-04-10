@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navigation from './Navigation';
+import BannerDisplay from './BannerDisplay';
 import axios from 'axios';
 
 function StudentClassDetail({ user, onLogout }) {
@@ -104,6 +105,7 @@ function StudentClassDetail({ user, onLogout }) {
 
         {/* Header */}
         <div className="welcome-section">
+          <BannerDisplay bannerId={classroom?.banner} />
           <h1>🏫 {classroom.name}</h1>
           <p>Taught by {classroom.teacher_username} · {students.length} student{students.length !== 1 ? 's' : ''}</p>
         </div>
