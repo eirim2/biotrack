@@ -184,16 +184,10 @@ function TeacherClassDetail({ user, onLogout }) {
         {error && <div className="error-message">{error}</div>}
 
         {/* Share code card */}
-        <div
-          className="tc-join-code-card"
-        >
+        <div className="tc-join-code-card">
           <div>
-            <p className="tc-join-code-label">
-              Join Code
-            </p>
-            <h2 className="tc-join-code-value">
-              {classroom.code}
-            </h2>
+            <p className="tc-join-code-label">Join Code</p>
+            <h2 className="tc-join-code-value">{classroom.code}</h2>
           </div>
           <button
             onClick={handleCopyCode}
@@ -206,9 +200,7 @@ function TeacherClassDetail({ user, onLogout }) {
         <div className="tc-two-col">
 
           {/* Students */}
-          <div
-            className="tc-panel"
-          >
+          <div className="tc-panel">
             <h3 className="tc-panel-h3">
               👥 Students
               <span className="tc-panel-count">({students.length})</span>
@@ -252,9 +244,7 @@ function TeacherClassDetail({ user, onLogout }) {
                     className={`tc-student-row${confirmRemove === student.username ? ' confirming' : ''}`}
                   >
                     <div className="tc-student-info">
-                      <p className="tc-student-name">
-                        {student.username}
-                      </p>
+                      <p className="tc-student-name">{student.username}</p>
                       <p className="tc-student-stats">
                         {student.discoveries} discoveries · {student.badges} badges · {student.quiz_scores} quizzes
                       </p>
@@ -269,12 +259,7 @@ function TeacherClassDetail({ user, onLogout }) {
                         >
                           {removingStudent === student.username ? '...' : 'Remove'}
                         </button>
-                        <button
-                          onClick={() => setConfirmRemove(null)}
-                          className="tc-cancel-btn"
-                        >
-                          Cancel
-                        </button>
+                        <button onClick={() => setConfirmRemove(null)} className="tc-cancel-btn">Cancel</button>
                       </div>
                     ) : (
                       <button
@@ -380,7 +365,7 @@ function TeacherClassDetail({ user, onLogout }) {
           )}
         </div>
 
-        {/* Class Banner Picker */}
+        {/* Class Banner Picker — now uses images */}
         <div className="tc-panel" style={{ marginTop: 24 }}>
           <h3 className="tc-panel-h3">🎨 Class Banner</h3>
           <p style={{ color: '#666', marginBottom: 16, fontSize: '0.9rem' }}>Choose a banner that will display at the top of this class page for you and your students.</p>
@@ -397,7 +382,11 @@ function TeacherClassDetail({ user, onLogout }) {
                   textAlign: 'center',
                 }}
               >
-                <div style={{ width: 120, height: 40, background: b.gradient }} />
+                <img
+                  src={b.image}
+                  alt={b.label}
+                  style={{ width: 120, height: 40, objectFit: 'cover', display: 'block' }}
+                />
                 <p style={{ fontSize: '0.75rem', margin: '4px 0', fontWeight: classroom?.banner === b.id ? 700 : 400 }}>{b.label}</p>
               </div>
             ))}

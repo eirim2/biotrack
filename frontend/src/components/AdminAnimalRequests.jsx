@@ -19,13 +19,11 @@ function AdminAnimalRequests({ user, onLogout }) {
 
   useEffect(() => { fetchRequests(); }, []);
 
-  const handleApprove = async (id) => {
-    try {
-      await axios.post(`/api/admin/animal-requests/${id}/approve?admin_username=${user.username}`);
-      setConfirmApprove(null);
-      fetchRequests();
-      navigate(`/admin/create-animal?request_id=${id}`);
-    } catch (err) { setError(err.response?.data?.detail || 'Failed to approve'); }
+  // Navigate to the create-animal page WITHOUT approving yet.
+  // The request will only be approved after the animal is successfully created.
+  const handleApprove = (id) => {
+    setConfirmApprove(null);
+    navigate(`/admin/create-animal?request_id=${id}`);
   };
 
   const handleDeny = async (id) => {

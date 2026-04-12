@@ -6,10 +6,12 @@ import axios from 'axios';
 function AdminCreateAnimal({ user, onLogout }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const requestId = searchParams.get('request_id');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [animals, setAnimals] = useState({});
+  const [requestData, setRequestData] = useState(null);
 
   const [form, setForm] = useState({
     commonName: '', scientificName: '', category: 'Mammal',
@@ -21,6 +23,25 @@ function AdminCreateAnimal({ user, onLogout }) {
   useEffect(() => {
     axios.get('/api/animals').then(r => setAnimals(r.data || {}));
   }, []);
+
+  // If coming from an animal request, fetch request data and pre-fill the form
+  useEffect(() => {
+    if (!requestId) return;
+    axios.get(`/api/admin/animal-requests?admin_username=${user.username}`)
+      .then(res => {
+        const req = (res.data || []).find(r => r.id === parseInt(requestId));
+        if (req) {
+          setRequestData(req);
+          setForm(prev => ({
+            ...prev,
+            commonName: req.common_name || '',
+            scientificName: req.scientific_name || '',
+            category: req.category || 'Mammal',
+          }));
+        }
+      })
+      .catch(() => {});
+  }, [requestId, user.username]);
 
   const nextId = () => {
     const ids = Object.keys(animals).map(Number);
@@ -49,13 +70,29 @@ function AdminCreateAnimal({ user, onLogout }) {
     };
     try {
       await axios.post(`/api/admin/animals?admin_username=${user.username}`, { id, data, image_name: imageName });
-      setSuccess(`Animal "${data.commonName}" created with ID ${id}`);
+
+      // If this was created from an animal request, NOW approve the request
+      if (requestId) {
+        try {
+          await axios.post(`/api/admin/animal-requests/${requestId}/approve?admin_username=${user.username}`);
+        } catch (approveErr) {
+          console.error('Failed to approve request after animal creation:', approveErr);
+        }
+      }
+
+      setSuccess(`Animal "${data.commonName}" created with ID ${id}${requestId ? ' — request approved!' : ''}`);
       setForm({ commonName: '', scientificName: '', category: 'Mammal', conservationStatus: 'Least Concern',
         habitat: '', region: '', diet: '', lifespan: '', weight: '', height: '', population: '',
         description: '', funFacts: ['', '', '', ''], imageName: '' });
+      setRequestData(null);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to create animal');
     } finally { setLoading(false); }
+  };
+
+  const handleCancel = () => {
+    // Navigate back without approving the request — it stays pending
+    navigate('/admin/animal-requests');
   };
 
   const categories = ['Mammal', 'Bird', 'Amphibian', 'Reptile', 'Fish', 'Invertebrate', 'Crustacean'];
@@ -69,6 +106,21 @@ function AdminCreateAnimal({ user, onLogout }) {
           <h1>➕ Create New Animal</h1>
           <p>Fill out the animal profile to add it to the platform</p>
         </div>
+
+        {requestData && (
+          <div className="alert-section alert-section-green" style={{ marginBottom: 20 }}>
+            <div>
+              <h3>📋 Creating from teacher request</h3>
+              <p>
+                <strong>{requestData.common_name}</strong> ({requestData.scientific_name}) — requested by {requestData.teacher_username}
+                {requestData.reason && <><br/>Reason: {requestData.reason}</>}
+              </p>
+              <p style={{ fontSize: '0.85rem', color: '#555', marginTop: 6 }}>
+                The request will be marked as approved only after you successfully create the animal below.
+              </p>
+            </div>
+          </div>
+        )}
 
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
@@ -106,8 +158,8 @@ function AdminCreateAnimal({ user, onLogout }) {
               <div className="form-group">
                 <label>Image Filename</label>
                 <input type="text" value={form.imageName} onChange={e => updateField('imageName', e.target.value)}
-                  placeholder="e.g. lion.jpg (must be in backend/static)" />
-                <p style={{ fontSize: 11, color: '#999', marginTop: 4 }}>File must exist in backend/static/ and be a valid image (.jpg, .jpeg, .png, .gif, .webp)</p>
+                  placeholder="e.g. animals/lion.jpg (must be in backend/static/animals)" />
+                <p style={{ fontSize: 11, color: '#999', marginTop: 4 }}>File must exist in backend/static/animals/ and be a valid image (.jpg, .jpeg, .png, .webp)</p>
               </div>
             </div>
             <div className="form-group">
@@ -125,7 +177,7 @@ function AdminCreateAnimal({ user, onLogout }) {
               <button type="submit" className="btn-primary" style={{ maxWidth: 240 }} disabled={loading}>
                 {loading ? 'Creating...' : 'Create Animal'}
               </button>
-              <button type="button" className="btn-back" onClick={() => navigate('/admin/animal-requests')}>Cancel</button>
+              <button type="button" className="btn-back" onClick={handleCancel}>Cancel</button>
             </div>
           </form>
         </div>

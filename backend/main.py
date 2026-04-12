@@ -1621,10 +1621,10 @@ def admin_create_animal(payload: AdminCreateAnimalRequest, admin_username: str, 
         raise HTTPException(status_code=400, detail="Animal ID already exists")
     image_name = payload.data.get("imageKey", "")
     if image_name:
-        valid_ext = ('.jpg', '.jpeg', '.png', '.gif', '.webp')
+        valid_ext = ('.jpg', '.jpeg', '.png', '.webp')
         img_path = STATIC_DIR / image_name
         if not img_path.exists() or not image_name.lower().endswith(valid_ext):
-            raise HTTPException(status_code=400, detail=f"Image '{image_name}' not found in backend/static or is not a valid image file")
+            raise HTTPException(status_code=400, detail=f"Image '{image_name}' not found in backend/static/animals or is not a valid image file")
     db.add(AnimalModel(id=payload.id, data=payload.data))
     db.commit()
     return {"message": "Animal created successfully", "id": payload.id}

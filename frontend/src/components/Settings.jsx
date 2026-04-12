@@ -13,14 +13,14 @@ const THEME_COLORS = {
 };
 
 const BANNERS = [
-  { id: "forest", label: "Forest", gradient: "linear-gradient(135deg, #2e7d32, #81c784)", placeholder: "🌲🌳🌿" },
-  { id: "safari", label: "Safari", gradient: "linear-gradient(135deg, #6d4c41, #f57c00)", placeholder: "🦁🌅🐘" },
-  { id: "ocean", label: "Ocean", gradient: "linear-gradient(135deg, #0d47a1, #0288d1)", placeholder: "🌊🐠🐋" },
-  { id: "desert", label: "Desert", gradient: "linear-gradient(135deg, #9b7b36, #fab54d)", placeholder: "🏜️🌵☀️" },
-  { id: "mesa", label: "Mesa", gradient: "linear-gradient(135deg, #D3503D, #E8872D)", placeholder: "🏔️🌄🦅" },
-  { id: "arctic", label: "Arctic", gradient: "linear-gradient(135deg, #3949AB, #7986CB)", placeholder: "❄️🐧🏔️" },
-  { id: "sunset", label: "Sunset", gradient: "linear-gradient(135deg, #ff6b35, #f7c59f)", placeholder: "🌇🌆✨" },
-  { id: "jungle", label: "Jungle", gradient: "linear-gradient(135deg, #1b5e20, #4caf50)", placeholder: "🌴🦜🐒" },
+  { id: "forest",  label: "Forest",  image: "/images/banners/forest.svg",  placeholder: "🌲🌳🌿" },
+  { id: "safari",  label: "Safari",  image: "/images/banners/safari.svg",  placeholder: "🦁🌅🐘" },
+  { id: "ocean",   label: "Ocean",   image: "/images/banners/ocean.svg",   placeholder: "🌊🐠🐋" },
+  { id: "desert",  label: "Desert",  image: "/images/banners/desert.svg",  placeholder: "🏜️🌵☀️" },
+  { id: "mesa",    label: "Mesa",    image: "/images/banners/mesa.svg",    placeholder: "🏔️🌄🦅" },
+  { id: "arctic",  label: "Arctic",  image: "/images/banners/arctic.svg",  placeholder: "❄️🐧🏔️" },
+  { id: "sunset",  label: "Sunset",  image: "/images/banners/sunset.svg",  placeholder: "🌇🌆✨" },
+  { id: "jungle",  label: "Jungle",  image: "/images/banners/jungle.svg",  placeholder: "🌴🦜🐒" },
 ];
 
 function Settings({ user, onLogout, updateUser }) {
@@ -84,9 +84,12 @@ function Settings({ user, onLogout, updateUser }) {
                 {BANNERS.map(b => (
                   <button key={b.id} className={`banner-option${banner === b.id ? ' active' : ''}`}
                     onClick={() => handleBannerChange(b.id)}>
-                    <div className="banner-preview banner-preview-wide" style={{ background: b.gradient }}>
-                      <span style={{ fontSize: 20 }}>{b.placeholder}</span>
-                    </div>
+                    <img
+                      className="banner-preview banner-preview-wide"
+                      src={b.image}
+                      alt={b.label}
+                      style={{ objectFit: 'cover', width: '100%' }}
+                    />
                     <span className="banner-label">{b.label}</span>
                     {banner === b.id && <span className="banner-check">✓</span>}
                   </button>

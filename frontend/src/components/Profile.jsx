@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from './Navigation';
+import BannerDisplay from './BannerDisplay';
 import axios from 'axios';
-import { BANNERS } from './Settings';
 
 function Profile({ user, onLogout, updateUser }) {
   const [animals, setAnimals] = useState([]);
@@ -47,16 +47,13 @@ function Profile({ user, onLogout, updateUser }) {
   };
 
   const discoveredAnimals = getDiscoveredAnimals();
-  const bannerData = BANNERS.find(b => b.id === user.banner);
 
   return (
     <div>
       <Navigation user={user} onLogout={onLogout} />
       <div className="profile-container">
         <div className="profile-header">
-          {bannerData && (
-            <div className="profile-banner" style={{ background: bannerData.gradient }} />
-          )}
+          <BannerDisplay bannerId={user.banner} />
           <h1>👤 {user.username}'s Profile</h1>
           <p>Your wildlife exploration journey</p>
           <div className="profile-stats">
