@@ -158,7 +158,7 @@ function AdminCreateAnimal({ user, onLogout }) {
               <div className="form-group">
                 <label>Image Filename</label>
                 <input type="text" value={form.imageName} onChange={e => updateField('imageName', e.target.value)}
-                  placeholder="e.g. animals/lion.jpg (must be in backend/static/animals)" />
+                  placeholder="e.g. lion.jpg" />
                 <p style={{ fontSize: 11, color: '#999', marginTop: 4 }}>File must exist in backend/static/animals/ and be a valid image (.jpg, .jpeg, .png, .webp)</p>
               </div>
             </div>
