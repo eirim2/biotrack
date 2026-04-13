@@ -1,4 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="200" viewBox="0 0 1200 200">
-  <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0d47a1"/><stop offset="100%" stop-color="#0288d1"/></linearGradient></defs>
-  <rect width="1200" height="200" fill="url(#g)"/>
+  <defs>
+    <linearGradient id="ocean" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0288d1"/>
+      <stop offset="50%" stop-color="#0277bd"/>
+      <stop offset="100%" stop-color="#01579b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="200" fill="url(#ocean)"/>
+  <!-- Light rays -->
+  <g opacity="0.08" fill="#fff">
+    <polygon points="200,0 250,200 180,200"/>
+    <polygon points="500,0 560,200 470,200"/>
+    <polygon points="800,0 870,200 760,200"/>
+    <polygon points="1050,0 1110,200 1010,200"/>
+  </g>
+  <!-- Waves - top -->
+  <path d="M0 30 Q75 10 150 30 Q225 50 300 30 Q375 10 450 30 Q525 50 600 30 Q675 10 750 30 Q825 50 900 30 Q975 10 1050 30 Q1125 50 1200 30 L1200 0 L0 0Z" fill="#039be5" opacity="0.5"/>
+  <!-- Bubbles -->
+  <g fill="#b3e5fc" opacity="0.3">
+    <circle cx="150" cy="60" r="4"/>
+    <circle cx="160" cy="75" r="2.5"/>
+    <circle cx="400" cy="90" r="5"/>
+    <circle cx="410" cy="110" r="3"/>
+    <circle cx="700" cy="70" r="3.5"/>
+    <circle cx="690" cy="50" r="2"/>
+    <circle cx="950" cy="80" r="4"/>
+    <circle cx="960" cy="100" r="2.5"/>
+  </g>
+  <!-- Fish silhouettes -->
+  <g fill="#0277bd" opacity="0.4">
+    <path d="M280 100 Q300 90 310 100 Q300 110 280 100 Z"/>
+    <polygon points="275,100 265,93 265,107"/>
+    <path d="M600 130 Q625 118 638 130 Q625 142 600 130 Z"/>
+    <polygon points="594,130 582,121 582,139"/>
+    <path d="M900 85 Q918 76 928 85 Q918 94 900 85 Z"/>
+    <polygon points="895,85 886,78 886,92"/>
+  </g>
+  <!-- Coral / seaweed silhouettes on bottom -->
+  <g fill="#01579b" opacity="0.5">
+    <path d="M100 200 Q105 170 115 175 Q120 160 130 170 Q135 155 145 165 Q150 200"/>
+    <path d="M350 200 Q355 165 365 175 Q370 150 380 165 Q390 200"/>
+    <path d="M650 200 Q660 175 670 180 Q675 160 685 170 Q695 200"/>
+    <path d="M950 200 Q960 170 970 178 Q975 155 985 168 Q990 200"/>
+    <circle cx="200" cy="190" r="12" fill="#0277bd" opacity="0.3"/>
+    <circle cx="215" cy="185" r="8" fill="#0277bd" opacity="0.3"/>
+    <circle cx="750" cy="192" r="10" fill="#0277bd" opacity="0.3"/>
+  </g>
+  <!-- Sandy bottom -->
+  <path d="M0 190 Q300 183 600 192 Q900 180 1200 188 L1200 200 L0 200Z" fill="#0d47a1" opacity="0.4"/>
 </svg>

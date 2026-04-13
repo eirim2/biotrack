@@ -19,7 +19,11 @@ export default function BannerDisplay({ bannerId }) {
       className="profile-banner"
       src={BANNER_IMAGES[bannerId]}
       alt={`${bannerId} banner`}
-      style={{ objectFit: 'cover', width: '100%' }}
+      style={{
+        objectFit: 'cover',
+        width: '100%',
+        display: 'block',
+      }}
     />
   );
 }

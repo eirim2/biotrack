@@ -1,4 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="200" viewBox="0 0 1200 200">
-  <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6d4c41"/><stop offset="100%" stop-color="#f57c00"/></linearGradient></defs>
-  <rect width="1200" height="200" fill="url(#g)"/>
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f57c00"/>
+      <stop offset="60%" stop-color="#e8934e"/>
+      <stop offset="100%" stop-color="#d4a574"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="200" fill="url(#sky)"/>
+  <!-- Sun -->
+  <circle cx="900" cy="60" r="35" fill="#fff3e0" opacity="0.8"/>
+  <circle cx="900" cy="60" r="28" fill="#ffe0b2" opacity="0.6"/>
+  <!-- Distant hills -->
+  <path d="M0 155 Q200 120 400 145 Q600 110 800 140 Q1000 115 1200 135 L1200 200 L0 200Z" fill="#8b6f47" opacity="0.4"/>
+  <!-- Acacia trees -->
+  <g fill="#4a3520">
+    <!-- Tree 1 -->
+    <rect x="195" y="120" width="6" height="60"/>
+    <ellipse cx="198" cy="115" rx="45" ry="18"/>
+    <!-- Tree 2 -->
+    <rect x="695" y="110" width="7" height="70"/>
+    <ellipse cx="698" cy="105" rx="50" ry="20"/>
+    <!-- Tree 3 - smaller distant -->
+    <rect x="1050" y="135" width="4" height="40"/>
+    <ellipse cx="1052" cy="132" rx="30" ry="12"/>
+  </g>
+  <!-- Animal silhouettes -->
+  <g fill="#3d2b1a" opacity="0.6">
+    <!-- Giraffe -->
+    <rect x="400" y="125" width="5" height="55"/>
+    <rect x="398" y="118" width="9" height="12" rx="2"/>
+    <rect x="401" y="105" width="3" height="15"/>
+    <circle cx="403" cy="103" r="4"/>
+    <!-- Elephant -->
+    <ellipse cx="550" cy="165" rx="25" ry="15"/>
+    <rect x="530" y="165" width="6" height="15"/>
+    <rect x="558" y="165" width="6" height="15"/>
+    <ellipse cx="540" cy="158" rx="8" ry="6"/>
+    <path d="M535 156 Q530 148 533 155" stroke="#3d2b1a" fill="none" stroke-width="2"/>
+  </g>
+  <!-- Ground -->
+  <path d="M0 175 Q300 170 600 178 Q900 168 1200 175 L1200 200 L0 200Z" fill="#6d4c41"/>
+  <!-- Grass tufts -->
+  <g fill="#5d4037" opacity="0.5">
+    <path d="M50 180 Q55 165 60 180"/>
+    <path d="M250 178 Q255 163 260 178"/>
+    <path d="M450 182 Q455 167 460 182"/>
+    <path d="M750 179 Q755 164 760 179"/>
+    <path d="M1000 181 Q1005 166 1010 181"/>
+  </g>
 </svg>

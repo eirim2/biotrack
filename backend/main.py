@@ -417,6 +417,9 @@ class FeedbackSubmitRequest(BaseModel):
 class BannerUpdateRequest(BaseModel):
     banner: str | None = None
 
+class AdminSetQuestionsRequest(BaseModel):
+    questions: list
+
 
 # ──────────────────────────────────────────────
 # Helper
@@ -1631,13 +1634,20 @@ def admin_create_animal(payload: AdminCreateAnimalRequest, admin_username: str, 
 
 
 @app.post("/api/admin/animals/{animal_id}/questions")
-def admin_set_animal_questions(animal_id: int, admin_username: str, db: Session = Depends(get_db)):
+def admin_set_animal_questions(animal_id: int, payload: AdminSetQuestionsRequest, admin_username: str, db: Session = Depends(get_db)):
     require_admin(admin_username, db)
+    if len(payload.questions) != 8:
+        raise HTTPException(status_code=400, detail="Exactly 8 questions are required")
+    for i, q in enumerate(payload.questions):
+        if not q.get("question") or not q.get("options") or len(q["options"]) != 4:
+            raise HTTPException(status_code=400, detail=f"Question {i+1} must have a question text and exactly 4 options")
+        if q.get("answer") not in (0, 1, 2, 3):
+            raise HTTPException(status_code=400, detail=f"Question {i+1} must have a valid answer index (0-3)")
     existing = db.query(QuestionModel).filter(QuestionModel.animal_id == animal_id).first()
     if existing:
-        existing.data = questions
+        existing.data = payload.questions
     else:
-        db.add(QuestionModel(animal_id=animal_id, data=questions))
+        db.add(QuestionModel(animal_id=animal_id, data=payload.questions))
     db.commit()
     return {"message": "Questions saved"}
 

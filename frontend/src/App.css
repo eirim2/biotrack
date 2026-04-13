@@ -3302,9 +3302,12 @@ body {
 
 /* Banner display on profile header */
 .profile-banner {
-  height: 120px;
+  height: 140px;
   border-radius: 20px 20px 0 0;
-  margin: -40px -40px 20px -40px;
+  margin: -40px -40px 24px -40px;
+  display: block;
+  object-fit: cover;
+  width: calc(100% + 80px);
 }
 
 /* ── Chatbot ────────────────────────────────────────────────────────────────── */

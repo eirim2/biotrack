@@ -3,6 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navigation from './Navigation';
 import axios from 'axios';
 
+const EMPTY_QUESTION = () => ({
+  question: '',
+  options: ['', '', '', ''],
+  answer: 0,
+});
+
 function AdminCreateAnimal({ user, onLogout }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -19,6 +25,11 @@ function AdminCreateAnimal({ user, onLogout }) {
     diet: '', lifespan: '', weight: '', height: '', population: '',
     description: '', funFacts: ['', '', '', ''], imageName: '',
   });
+
+  // 8 questions, each with question text, 4 options, and correct answer index
+  const [questions, setQuestions] = useState(
+    Array.from({ length: 8 }, () => EMPTY_QUESTION())
+  );
 
   useEffect(() => {
     axios.get('/api/animals').then(r => setAnimals(r.data || {}));
@@ -55,9 +66,54 @@ function AdminCreateAnimal({ user, onLogout }) {
     setForm(p => ({ ...p, funFacts: facts }));
   };
 
+  const updateQuestion = (qIndex, field, value) => {
+    setQuestions(prev => {
+      const updated = [...prev];
+      updated[qIndex] = { ...updated[qIndex], [field]: value };
+      return updated;
+    });
+  };
+
+  const updateOption = (qIndex, optIndex, value) => {
+    setQuestions(prev => {
+      const updated = [...prev];
+      const newOptions = [...updated[qIndex].options];
+      newOptions[optIndex] = value;
+      updated[qIndex] = { ...updated[qIndex], options: newOptions };
+      return updated;
+    });
+  };
+
+  const validateQuestions = () => {
+    for (let i = 0; i < 8; i++) {
+      const q = questions[i];
+      if (!q.question.trim()) {
+        return `Question ${i + 1}: Please enter the question text.`;
+      }
+      for (let j = 0; j < 4; j++) {
+        if (!q.options[j].trim()) {
+          return `Question ${i + 1}, Option ${j + 1}: Please fill in all 4 options.`;
+        }
+      }
+      if (q.answer < 0 || q.answer > 3) {
+        return `Question ${i + 1}: Please select the correct answer.`;
+      }
+    }
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); setSuccess(''); setLoading(true);
+
+    // Validate questions first
+    const questionError = validateQuestions();
+    if (questionError) {
+      setError(questionError);
+      setLoading(false);
+      return;
+    }
+
     const id = nextId();
     const imageName = form.imageName.trim();
     const data = {
@@ -68,10 +124,23 @@ function AdminCreateAnimal({ user, onLogout }) {
       population: form.population.trim(), description: form.description.trim(),
       funFacts: form.funFacts.filter(f => f.trim()), imageKey: imageName,
     };
+
     try {
+      // Step 1: Create the animal
       await axios.post(`/api/admin/animals?admin_username=${user.username}`, { id, data, image_name: imageName });
 
-      // If this was created from an animal request, NOW approve the request
+      // Step 2: Save the 8 questions for this animal
+      const formattedQuestions = questions.map(q => ({
+        question: q.question.trim(),
+        options: q.options.map(o => o.trim()),
+        answer: q.answer,
+      }));
+
+      await axios.post(`/api/admin/animals/${id}/questions?admin_username=${user.username}`, {
+        questions: formattedQuestions,
+      });
+
+      // Step 3: If this was created from an animal request, approve the request
       if (requestId) {
         try {
           await axios.post(`/api/admin/animal-requests/${requestId}/approve?admin_username=${user.username}`);
@@ -80,10 +149,11 @@ function AdminCreateAnimal({ user, onLogout }) {
         }
       }
 
-      setSuccess(`Animal "${data.commonName}" created with ID ${id}${requestId ? ' — request approved!' : ''}`);
+      setSuccess(`Animal "${data.commonName}" created with ID ${id} and 8 quiz questions saved!${requestId ? ' Request approved.' : ''}`);
       setForm({ commonName: '', scientificName: '', category: 'Mammal', conservationStatus: 'Least Concern',
         habitat: '', region: '', diet: '', lifespan: '', weight: '', height: '', population: '',
         description: '', funFacts: ['', '', '', ''], imageName: '' });
+      setQuestions(Array.from({ length: 8 }, () => EMPTY_QUESTION()));
       setRequestData(null);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to create animal');
@@ -91,7 +161,6 @@ function AdminCreateAnimal({ user, onLogout }) {
   };
 
   const handleCancel = () => {
-    // Navigate back without approving the request — it stays pending
     navigate('/admin/animal-requests');
   };
 
@@ -104,7 +173,7 @@ function AdminCreateAnimal({ user, onLogout }) {
       <div className="profile-container">
         <div className="profile-header">
           <h1>➕ Create New Animal</h1>
-          <p>Fill out the animal profile to add it to the platform</p>
+          <p>Fill out the animal profile and quiz questions to add it to the platform</p>
         </div>
 
         {requestData && (
@@ -125,8 +194,10 @@ function AdminCreateAnimal({ user, onLogout }) {
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
 
-        <div className="profile-section">
-          <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
+          {/* ── Animal Info Section ─────────────────────────────────────── */}
+          <div className="profile-section" style={{ marginBottom: 24 }}>
+            <h2>🐾 Animal Information</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div className="form-group">
                 <label>Common Name *</label>
@@ -173,14 +244,86 @@ function AdminCreateAnimal({ user, onLogout }) {
                   placeholder={`Fun fact ${i + 1}`} style={{ marginBottom: 8 }} />
               ))}
             </div>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button type="submit" className="btn-primary" style={{ maxWidth: 240 }} disabled={loading}>
-                {loading ? 'Creating...' : 'Create Animal'}
-              </button>
-              <button type="button" className="btn-back" onClick={handleCancel}>Cancel</button>
-            </div>
-          </form>
-        </div>
+          </div>
+
+          {/* ── Quiz Questions Section ─────────────────────────────────── */}
+          <div className="profile-section" style={{ marginBottom: 24 }}>
+            <h2>📝 Quiz Questions (8 Required)</h2>
+            <p style={{ color: '#666', marginBottom: 20, fontSize: '0.9rem' }}>
+              Each question must have question text, exactly 4 answer options, and a correct answer selected.
+            </p>
+
+            {questions.map((q, qIdx) => (
+              <div key={qIdx} style={{
+                background: qIdx % 2 === 0 ? '#fafafa' : '#fff',
+                border: '1px solid #ececec',
+                borderRadius: 12,
+                padding: 20,
+                marginBottom: 16,
+              }}>
+                <h3 style={{ fontSize: '1rem', color: 'var(--dark-gradient)', marginBottom: 12 }}>
+                  Question {qIdx + 1} of 8
+                </h3>
+
+                <div className="form-group" style={{ marginBottom: 16 }}>
+                  <label>Question Text *</label>
+                  <input
+                    type="text"
+                    value={q.question}
+                    onChange={e => updateQuestion(qIdx, 'question', e.target.value)}
+                    placeholder={`Enter question ${qIdx + 1}...`}
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                  {q.options.map((opt, optIdx) => (
+                    <div key={optIdx} className="form-group" style={{ marginBottom: 0 }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <input
+                          type="radio"
+                          name={`correct-${qIdx}`}
+                          checked={q.answer === optIdx}
+                          onChange={() => updateQuestion(qIdx, 'answer', optIdx)}
+                          style={{ accentColor: 'var(--select-color)' }}
+                        />
+                        <span style={{
+                          fontWeight: q.answer === optIdx ? 700 : 400,
+                          color: q.answer === optIdx ? 'var(--select-color)' : '#555',
+                        }}>
+                          Option {optIdx + 1} {q.answer === optIdx ? '✓ Correct' : ''}
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        value={opt}
+                        onChange={e => updateOption(qIdx, optIdx, e.target.value)}
+                        placeholder={`Option ${optIdx + 1}`}
+                        required
+                        style={{
+                          borderColor: q.answer === optIdx ? 'var(--select-color)' : undefined,
+                          background: q.answer === optIdx ? 'rgba(122,155,84,0.05)' : undefined,
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <p style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
+                  Select the radio button next to the correct answer option.
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Submit ─────────────────────────────────────────────────── */}
+          <div style={{ display: 'flex', gap: 12, marginBottom: 40 }}>
+            <button type="submit" className="btn-primary" style={{ maxWidth: 300 }} disabled={loading}>
+              {loading ? 'Creating...' : 'Create Animal & Save Questions'}
+            </button>
+            <button type="button" className="btn-back" onClick={handleCancel}>Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
   );
