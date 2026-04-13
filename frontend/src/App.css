@@ -1090,6 +1090,7 @@ body {
   border-radius: 20px;
   margin-bottom: 30px;
   text-align: center;
+  overflow: hidden;
 }
 
 .profile-header h1 {
@@ -3305,9 +3306,8 @@ body {
   height: 140px;
   border-radius: 20px 20px 0 0;
   margin: -40px -40px 24px -40px;
-  display: block;
-  object-fit: cover;
   width: calc(100% + 80px);
+  display: block;
 }
 
 /* ── Chatbot ────────────────────────────────────────────────────────────────── */

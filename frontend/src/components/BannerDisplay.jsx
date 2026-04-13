@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Map banner IDs to their image paths (served via /images/ static mount)
 const BANNER_IMAGES = {
   forest: "/images/banners/forest.svg",
   safari: "/images/banners/safari.svg",
@@ -15,14 +14,13 @@ const BANNER_IMAGES = {
 export default function BannerDisplay({ bannerId }) {
   if (!bannerId || !BANNER_IMAGES[bannerId]) return null;
   return (
-    <img
+    <div
       className="profile-banner"
-      src={BANNER_IMAGES[bannerId]}
-      alt={`${bannerId} banner`}
       style={{
-        objectFit: 'cover',
-        width: '100%',
-        display: 'block',
+        backgroundImage: `url(${BANNER_IMAGES[bannerId]})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     />
   );

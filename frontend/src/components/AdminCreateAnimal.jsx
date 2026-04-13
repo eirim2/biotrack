@@ -26,7 +26,6 @@ function AdminCreateAnimal({ user, onLogout }) {
     description: '', funFacts: ['', '', '', ''], imageName: '',
   });
 
-  // 8 questions, each with question text, 4 options, and correct answer index
   const [questions, setQuestions] = useState(
     Array.from({ length: 8 }, () => EMPTY_QUESTION())
   );
@@ -35,7 +34,6 @@ function AdminCreateAnimal({ user, onLogout }) {
     axios.get('/api/animals').then(r => setAnimals(r.data || {}));
   }, []);
 
-  // If coming from an animal request, fetch request data and pre-fill the form
   useEffect(() => {
     if (!requestId) return;
     axios.get(`/api/admin/animal-requests?admin_username=${user.username}`)
@@ -92,11 +90,8 @@ function AdminCreateAnimal({ user, onLogout }) {
       }
       for (let j = 0; j < 4; j++) {
         if (!q.options[j].trim()) {
-          return `Question ${i + 1}, Option ${j + 1}: Please fill in all 4 options.`;
+          return `Question ${i + 1}, Option ${String.fromCharCode(65 + j)}: Please fill in all 4 options.`;
         }
-      }
-      if (q.answer < 0 || q.answer > 3) {
-        return `Question ${i + 1}: Please select the correct answer.`;
       }
     }
     return null;
@@ -106,7 +101,6 @@ function AdminCreateAnimal({ user, onLogout }) {
     e.preventDefault();
     setError(''); setSuccess(''); setLoading(true);
 
-    // Validate questions first
     const questionError = validateQuestions();
     if (questionError) {
       setError(questionError);
@@ -126,10 +120,8 @@ function AdminCreateAnimal({ user, onLogout }) {
     };
 
     try {
-      // Step 1: Create the animal
       await axios.post(`/api/admin/animals?admin_username=${user.username}`, { id, data, image_name: imageName });
 
-      // Step 2: Save the 8 questions for this animal
       const formattedQuestions = questions.map(q => ({
         question: q.question.trim(),
         options: q.options.map(o => o.trim()),
@@ -140,7 +132,6 @@ function AdminCreateAnimal({ user, onLogout }) {
         questions: formattedQuestions,
       });
 
-      // Step 3: If this was created from an animal request, approve the request
       if (requestId) {
         try {
           await axios.post(`/api/admin/animal-requests/${requestId}/approve?admin_username=${user.username}`);
@@ -166,6 +157,7 @@ function AdminCreateAnimal({ user, onLogout }) {
 
   const categories = ['Mammal', 'Bird', 'Amphibian', 'Reptile', 'Fish', 'Invertebrate', 'Crustacean'];
   const statuses = ['Least Concern', 'Vulnerable', 'Endangered', 'Critically Endangered'];
+  const optionLabels = ['A', 'B', 'C', 'D'];
 
   return (
     <div>
@@ -184,9 +176,6 @@ function AdminCreateAnimal({ user, onLogout }) {
                 <strong>{requestData.common_name}</strong> ({requestData.scientific_name}) — requested by {requestData.teacher_username}
                 {requestData.reason && <><br/>Reason: {requestData.reason}</>}
               </p>
-              <p style={{ fontSize: '0.85rem', color: '#555', marginTop: 6 }}>
-                The request will be marked as approved only after you successfully create the animal below.
-              </p>
             </div>
           </div>
         )}
@@ -195,7 +184,7 @@ function AdminCreateAnimal({ user, onLogout }) {
         {success && <div className="success-message">{success}</div>}
 
         <form onSubmit={handleSubmit}>
-          {/* ── Animal Info Section ─────────────────────────────────────── */}
+          {/* Animal Info */}
           <div className="profile-section" style={{ marginBottom: 24 }}>
             <h2>🐾 Animal Information</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -230,7 +219,7 @@ function AdminCreateAnimal({ user, onLogout }) {
                 <label>Image Filename</label>
                 <input type="text" value={form.imageName} onChange={e => updateField('imageName', e.target.value)}
                   placeholder="e.g. lion.jpg" />
-                <p style={{ fontSize: 11, color: '#999', marginTop: 4 }}>File must exist in backend/static/animals/ and be a valid image (.jpg, .jpeg, .png, .webp)</p>
+                <p style={{ fontSize: 11, color: '#999', marginTop: 4 }}>Must exist in backend/static/animals/ (.jpg, .jpeg, .png, .webp)</p>
               </div>
             </div>
             <div className="form-group">
@@ -246,26 +235,42 @@ function AdminCreateAnimal({ user, onLogout }) {
             </div>
           </div>
 
-          {/* ── Quiz Questions Section ─────────────────────────────────── */}
+          {/* Quiz Questions */}
           <div className="profile-section" style={{ marginBottom: 24 }}>
             <h2>📝 Quiz Questions (8 Required)</h2>
-            <p style={{ color: '#666', marginBottom: 20, fontSize: '0.9rem' }}>
-              Each question must have question text, exactly 4 answer options, and a correct answer selected.
+            <p style={{ color: '#666', marginBottom: 24, fontSize: '0.9rem' }}>
+              Each question needs question text, 4 answer options, and a correct answer selected.
             </p>
 
             {questions.map((q, qIdx) => (
               <div key={qIdx} style={{
-                background: qIdx % 2 === 0 ? '#fafafa' : '#fff',
-                border: '1px solid #ececec',
+                border: '2px solid #e0e0e0',
                 borderRadius: 12,
-                padding: 20,
-                marginBottom: 16,
+                padding: 24,
+                marginBottom: 20,
+                background: '#fff',
               }}>
-                <h3 style={{ fontSize: '1rem', color: 'var(--dark-gradient)', marginBottom: 12 }}>
-                  Question {qIdx + 1} of 8
-                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                  <span style={{
+                    background: 'var(--select-color)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    {qIdx + 1}
+                  </span>
+                  <span style={{ fontWeight: 600, color: 'var(--top-gradient)', fontSize: '1rem' }}>
+                    Question {qIdx + 1} of 8
+                  </span>
+                </div>
 
-                <div className="form-group" style={{ marginBottom: 16 }}>
+                <div className="form-group" style={{ marginBottom: 20 }}>
                   <label>Question Text *</label>
                   <input
                     type="text"
@@ -276,47 +281,75 @@ function AdminCreateAnimal({ user, onLogout }) {
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-                  {q.options.map((opt, optIdx) => (
-                    <div key={optIdx} className="form-group" style={{ marginBottom: 0 }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <input
-                          type="radio"
-                          name={`correct-${qIdx}`}
-                          checked={q.answer === optIdx}
-                          onChange={() => updateQuestion(qIdx, 'answer', optIdx)}
-                          style={{ accentColor: 'var(--select-color)' }}
-                        />
-                        <span style={{
-                          fontWeight: q.answer === optIdx ? 700 : 400,
-                          color: q.answer === optIdx ? 'var(--select-color)' : '#555',
-                        }}>
-                          Option {optIdx + 1} {q.answer === optIdx ? '✓ Correct' : ''}
-                        </span>
-                      </label>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#555', marginBottom: 12 }}>
+                  Answer Options (select the correct one):
+                </p>
+
+                {q.options.map((opt, optIdx) => {
+                  const isCorrect = q.answer === optIdx;
+                  return (
+                    <div key={optIdx} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      marginBottom: 10,
+                      padding: '10px 14px',
+                      borderRadius: 10,
+                      border: isCorrect ? '2px solid var(--select-color)' : '2px solid #e8e8e8',
+                      background: isCorrect ? 'rgba(122,155,84,0.06)' : '#fafafa',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => updateQuestion(qIdx, 'answer', optIdx)}
+                    >
+                      <input
+                        type="radio"
+                        name={`q${qIdx}-answer`}
+                        checked={isCorrect}
+                        onChange={() => updateQuestion(qIdx, 'answer', optIdx)}
+                        style={{ accentColor: 'var(--select-color)', width: 18, height: 18, flexShrink: 0 }}
+                      />
+                      <span style={{
+                        fontWeight: 700,
+                        fontSize: 14,
+                        color: isCorrect ? 'var(--select-color)' : '#888',
+                        minWidth: 20,
+                        flexShrink: 0,
+                      }}>
+                        {optionLabels[optIdx]}
+                      </span>
                       <input
                         type="text"
                         value={opt}
-                        onChange={e => updateOption(qIdx, optIdx, e.target.value)}
-                        placeholder={`Option ${optIdx + 1}`}
+                        onChange={e => {
+                          e.stopPropagation();
+                          updateOption(qIdx, optIdx, e.target.value);
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        placeholder={`Option ${optionLabels[optIdx]}`}
                         required
                         style={{
-                          borderColor: q.answer === optIdx ? 'var(--select-color)' : undefined,
-                          background: q.answer === optIdx ? 'rgba(122,155,84,0.05)' : undefined,
+                          flex: 1,
+                          border: 'none',
+                          background: 'transparent',
+                          outline: 'none',
+                          fontSize: '0.95rem',
+                          padding: '6px 0',
+                          fontFamily: 'inherit',
                         }}
                       />
+                      {isCorrect && (
+                        <span style={{ color: 'var(--select-color)', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                          ✓ Correct
+                        </span>
+                      )}
                     </div>
-                  ))}
-                </div>
-
-                <p style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
-                  Select the radio button next to the correct answer option.
-                </p>
+                  );
+                })}
               </div>
             ))}
           </div>
 
-          {/* ── Submit ─────────────────────────────────────────────────── */}
+          {/* Submit */}
           <div style={{ display: 'flex', gap: 12, marginBottom: 40 }}>
             <button type="submit" className="btn-primary" style={{ maxWidth: 300 }} disabled={loading}>
               {loading ? 'Creating...' : 'Create Animal & Save Questions'}
