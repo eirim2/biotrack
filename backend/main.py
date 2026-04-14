@@ -243,7 +243,10 @@ def seed_from_json():
         if animals_path.exists():
             animals = json.loads(animals_path.read_text(encoding="utf-8"))
             for animal_id, animal_data in animals.items():
-                if not db.query(AnimalModel).filter(AnimalModel.id == int(animal_id)).first():
+                existing = db.query(AnimalModel).filter(AnimalModel.id == int(animal_id)).first()
+                if existing:
+                    existing.data = animal_data
+                else:
                     db.add(AnimalModel(id=int(animal_id), data=animal_data))
             db.commit()
 

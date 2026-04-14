@@ -459,7 +459,7 @@
       "Males inflate a thoracic air sac to produce a deep booming call during mating season",
       "Every known kakapo has been given an individual name by conservationists"
     ],
-    "imageKey": ""
+    "imageKey": "animals/kakapo.jpg"
   },
   "22": {
     "id": 22,
@@ -481,7 +481,7 @@
       "Hawksbills can navigate thousands of miles back to the beach where they were born to lay eggs",
       "Their pointed beak allows them to reach into reef crevices to find food"
     ],
-    "imageKey": ""
+    "imageKey": "animals/hawksbill_sea_turtle.jpg"
   },
   "23": {
     "id": 23,
@@ -503,7 +503,7 @@
       "Clownfish rarely stray more than a few meters from their host anemone",
       "They communicate using popping and clicking sounds"
     ],
-    "imageKey": ""
+    "imageKey": "animals/clownfish.jpg"
   },
   "24": {
     "id": 24,
@@ -525,7 +525,7 @@
       "Each whale shark has a unique spot pattern used for individual identification",
       "Their mouths can be up to 1.5 meters wide but their throat is only about the size of a quarter"
     ],
-    "imageKey": ""
+    "imageKey": "animals/whale_shark.jpg"
   },
   "25": {
     "id": 25,
@@ -547,7 +547,7 @@
       "Their bright orange coloring warns predators that they are toxic",
       "Monarchs use the Earth's magnetic field and the position of the sun to navigate"
     ],
-    "imageKey": ""
+    "imageKey": "animals/monarch_butterfly.jpg"
   },
   "26": {
     "id": 26,
@@ -569,7 +569,7 @@
       "Their eggs can hatch early if they detect vibrations from a predator like a snake",
       "They spend most of their lives in the tree canopy, coming down only to breed"
     ],
-    "imageKey": ""
+    "imageKey": "animals/red_eyed_tree_frog.jpg"
   },
   "27": {
     "id": 27,
@@ -591,7 +591,7 @@
       "They can survive up to a year without food or water",
       "Different islands produced tortoises with differently shaped shells"
     ],
-    "imageKey": ""
+    "imageKey": "animals/galapagos_tortoise.jpg"
   },
   "28": {
     "id": 28,
@@ -613,7 +613,7 @@
       "A pangolin's tongue can be longer than its entire body",
       "When curled into a ball, even lions cannot bite through their scales"
     ],
-    "imageKey": ""
+    "imageKey": "animals/pangolin.jpg"
   },
   "29": {
     "id": 29,
@@ -635,7 +635,7 @@
       "Their teeth are arranged in rows and are constantly replaced throughout their lives",
       "Great whites are warm-blooded, unlike most other sharks"
     ],
-    "imageKey": ""
+    "imageKey": "animals/great_white_shark.jpg"
   },
   "30": {
     "id": 30,
@@ -657,6 +657,6 @@
       "They have 10 eyes distributed around their body",
       "They are more closely related to spiders than to crabs"
     ],
-    "imageKey": ""
+    "imageKey": "animals/horseshoe_crab.jpg"
   }
 }
