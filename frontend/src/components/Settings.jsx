@@ -13,14 +13,12 @@ const THEME_COLORS = {
 };
 
 const BANNERS = [
-  { id: "forest",  label: "Forest",  image: "/images/banners/forest.svg",  placeholder: "🌲🌳🌿" },
-  { id: "safari",  label: "Safari",  image: "/images/banners/safari.svg",  placeholder: "🦁🌅🐘" },
-  { id: "ocean",   label: "Ocean",   image: "/images/banners/ocean.svg",   placeholder: "🌊🐠🐋" },
-  { id: "desert",  label: "Desert",  image: "/images/banners/desert.svg",  placeholder: "🏜️🌵☀️" },
-  { id: "mesa",    label: "Mesa",    image: "/images/banners/mesa.svg",    placeholder: "🏔️🌄🦅" },
-  { id: "arctic",  label: "Arctic",  image: "/images/banners/arctic.svg",  placeholder: "❄️🐧🏔️" },
-  { id: "sunset",  label: "Sunset",  image: "/images/banners/sunset.svg",  placeholder: "🌇🌆✨" },
-  { id: "jungle",  label: "Jungle",  image: "/images/banners/jungle.svg",  placeholder: "🌴🦜🐒" },
+  { id: "forest",  label: "Forest",  image: "/images/banners/forest.png",  placeholder: "🌲🌳🌿" },
+  { id: "safari",  label: "Safari",  image: "/images/banners/safari.jpg",  placeholder: "🦁🌅🐘" },
+  { id: "ocean",   label: "Ocean",   image: "/images/banners/ocean.png",   placeholder: "🌊🐠🐋" },
+  { id: "desert",  label: "Desert",  image: "/images/banners/desert.jpg",  placeholder: "🏜️🌵☀️" },
+  { id: "mesa",    label: "Mesa",    image: "/images/banners/mesa.jpg",    placeholder: "🏔️🌄🦅" },
+  { id: "arctic",  label: "Arctic",  image: "/images/banners/arctic.png",  placeholder: "❄️🐧🏔️" },
 ];
 
 function Settings({ user, onLogout, updateUser }) {

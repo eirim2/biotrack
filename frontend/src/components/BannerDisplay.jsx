@@ -1,17 +1,15 @@
 import React from 'react';
 
 const BANNER_IMAGES = {
-  forest: "/images/banners/forest.svg",
-  safari: "/images/banners/safari.svg",
-  ocean: "/images/banners/ocean.svg",
-  desert: "/images/banners/desert.svg",
-  mesa: "/images/banners/mesa.svg",
-  arctic: "/images/banners/arctic.svg",
-  sunset: "/images/banners/sunset.svg",
-  jungle: "/images/banners/jungle.svg",
+  forest: "/images/banners/forest.png",
+  safari: "/images/banners/safari.jpg",
+  ocean: "/images/banners/ocean.png",
+  desert: "/images/banners/desert.jpg",
+  mesa: "/images/banners/mesa.jpg",
+  arctic: "/images/banners/arctic.png",
 };
 
-export default function BannerDisplay({ bannerId }) {
+export default function BannerDisplay({ bannerId, height = 250}) {
   if (!bannerId || !BANNER_IMAGES[bannerId]) return null;
   return (
     <div
@@ -21,6 +19,7 @@ export default function BannerDisplay({ bannerId }) {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
+        height,
       }}
     />
   );
